@@ -1,14 +1,11 @@
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 public class Yatzy {
 
-    public static int chance(int d1, int d2, int d3, int d4, int d5)
-    {
-        int total = 0;
-        total += d1;
-        total += d2;
-        total += d3;
-        total += d4;
-        total += d5;
-        return total;
+    public static int chance(int... dices) {
+        return Arrays.stream(dices).sum();
     }
 
     public static int yatzy(int... dice)
@@ -16,43 +13,27 @@ public class Yatzy {
         int[] counts = new int[6];
         for (int die : dice)
             counts[die-1]++;
+
         for (int i = 0; i != 6; i++)
             if (counts[i] == 5)
                 return 50;
         return 0;
     }
 
-    public static int ones(int d1, int d2, int d3, int d4, int d5) {
-        int sum = 0;
-        if (d1 == 1) sum++;
-        if (d2 == 1) sum++;
-        if (d3 == 1) sum++;
-        if (d4 == 1) sum++;
-        if (d5 == 1) 
-            sum++;
-
-        return sum;
+    private static int sumSameValues(int vald, int... d) {
+        return Arrays.stream(d).filter(v->v == vald).sum();
     }
 
-    public static int twos(int d1, int d2, int d3, int d4, int d5) {
-        int sum = 0;
-        if (d1 == 2) sum += 2;
-        if (d2 == 2) sum += 2;
-        if (d3 == 2) sum += 2;
-        if (d4 == 2) sum += 2;
-        if (d5 == 2) sum += 2;
-        return sum;
+    public static int ones(int... dices) {
+        return sumSameValues(1, dices);
     }
 
-    public static int threes(int d1, int d2, int d3, int d4, int d5) {
-        int s;    
-        s = 0;
-        if (d1 == 3) s += 3;
-        if (d2 == 3) s += 3;
-        if (d3 == 3) s += 3;
-        if (d4 == 3) s += 3;
-        if (d5 == 3) s += 3;
-        return s;
+    public static int twos(int... dices) {
+        return sumSameValues(2, dices);
+    }
+
+    public static int threes(int... dices) {
+        return sumSameValues(3, dices);
     }
 
     protected int[] dice;
@@ -66,71 +47,43 @@ public class Yatzy {
         dice[4] = _5;
     }
 
-    public int fours()
-    {
-        int sum;    
-        sum = 0;
-        for (int at = 0; at != 5; at++) {
-            if (dice[at] == 4) {
-                sum += 4;
-            }
-        }
-        return sum;
+    public int fours() {
+        return sumSameValues(4, dice);
     }
 
-    public int fives()
-    {
-        int s = 0;
-        int i;
-        for (i = 0; i < dice.length; i++) 
-            if (dice[i] == 5)
-                s = s + 5;
-        return s;
+    public int fives() {
+        return sumSameValues(5, dice);
     }
 
-    public int sixes()
-    {
-        int sum = 0;
-        for (int at = 0; at < dice.length; at++) 
-            if (dice[at] == 6)
-                sum = sum + 6;
-        return sum;
+    public int sixes() {
+        return sumSameValues(6, dice);
     }
 
-    public static int score_pair(int d1, int d2, int d3, int d4, int d5)
-    {
-        int[] counts = new int[6];
-        counts[d1-1]++;
-        counts[d2-1]++;
-        counts[d3-1]++;
-        counts[d4-1]++;
-        counts[d5-1]++;
-        int at;
-        for (at = 0; at != 6; at++)
-            if (counts[6-at-1] >= 2)
-                return (6-at)*2;
+    public static int score_pair(Integer... dices) {
+        Integer current = getBiggerCouple(dices);
+        if (current != null) return current *2;
         return 0;
     }
 
-    public static int two_pair(int d1, int d2, int d3, int d4, int d5)
-    {
-        int[] counts = new int[6];
-        counts[d1-1]++;
-        counts[d2-1]++;
-        counts[d3-1]++;
-        counts[d4-1]++;
-        counts[d5-1]++;
-        int n = 0;
-        int score = 0;
-        for (int i = 0; i < 6; i += 1)
-            if (counts[6-i-1] >= 2) {
-                n++;
-                score += (6-i);
-            }        
-        if (n == 2)
-            return score * 2;
-        else
-            return 0;
+    private static Integer getBiggerCouple(Integer[] dices) {
+        Arrays.sort(dices);
+
+        List<Integer> ints = Arrays.asList(dices);
+        Collections.reverse(ints);
+
+        for(int i=0; i < ints.size(); i++){
+            Integer current = ints.get(i);
+            int lastIndex = ints.lastIndexOf(current);
+
+            if (lastIndex != i && lastIndex != -1){
+                return current;
+            }
+        }
+        return null;
+    }
+
+    public static int two_pair(Integer... dices) {
+        Integer biggerCouple = getBiggerCouple(dices);
     }
 
     public static int four_of_a_kind(int _1, int _2, int d3, int d4, int d5)
